@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommended Movies</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 2rem;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .movie-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .movie-poster img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .movie-title {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        .movie-link {
+            display: inline-block;
+            color: #e50914;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .movie-link:hover {
+            color: #ff4b2b;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Recommended Movies</h1>
+    <div class="container">
+        <div id="recommended-movies" class="movies-grid"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/recommend-movies')
+                .then(response => response.json())
+                .then(movies => {
+                    const container = document.getElementById('recommended-movies');
+                    container.innerHTML = '';
+
+                    if (movies.length === 0) {
+                        container.innerHTML = "<p>No recommendations found.</p>";
+                        return;
+                    }
+
+                    movies.forEach(movie => {
+                        const movieElement = document.createElement('div');
+                        movieElement.className = 'movie-container';
+
+                        const posterPath = movie.poster_path
+                            ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                            : 'https://via.placeholder.com/200x300?text=No+Image';
+
+                        movieElement.innerHTML = `
+                            <div class="movie-poster">
+                                <img src="${posterPath}" alt="${movie.title}">
+                            </div>
+                            <div class="movie-title">${movie.title}</div>
+                            <p>${movie.overview}</p>
+                            <a href="https://www.themoviedb.org/movie/${movie.id}" target="_blank" class="movie-link">See More</a>
+                        `;
+
+                        container.appendChild(movieElement);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching recommendations:', error);
+                    document.getElementById('recommended-movies').innerHTML = "<p>Error loading recommendations.</p>";
+                });
+        });
+    </script>
+</body>
+
+</html>
